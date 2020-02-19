@@ -360,14 +360,14 @@
       (progn (call-interactively 'clipboard-kill-ring-save))
     (if (region-active-p)
         (progn
-          (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
+          (shell-command-on-region (region-beginning) (region-end) "pbcopy")
           (deactivate-mark)))))
 (defun paste-from-clipboard ()
   "Paste from clipboard."
   (interactive)
   (if (display-graphic-p)
       (progn (clipboard-yank))
-    (insert (shell-command-to-string "xsel -o -b"))))
+    (insert (shell-command-to-string "pbpaste"))))
 (defun mark-backword (&optional arg allow-extend)
   "Reverse of mark-word(ARG ALLOW-EXTEND)."
   (interactive "P\np")
@@ -569,8 +569,10 @@
 (global-set-key (kbd "C-x x s") 'share-to-online)
 (global-set-key (kbd "C-x x t") 'untabify)
 (global-set-key (kbd "C-x x T") 'tabify)
-(global-set-key (kbd "C-x x M-w") 'copy-to-clipboard)
-(global-set-key (kbd "C-x x C-y") 'paste-from-clipboard)
+;(global-set-key (kbd "C-x x M-w") 'copy-to-clipboard)
+(global-set-key (kbd "M-w") 'copy-to-clipboard)
+;(global-set-key (kbd "C-x x C-y") 'paste-from-clipboard)
+(global-set-key (kbd "C-y") 'paste-from-clipboard)
 (global-set-key (kbd "C-x 2") 'split-window-vertically-last-buffer)
 (global-set-key (kbd "C-x 3") 'split-window-horizontally-last-buffer)
 (global-set-key (kbd "C-x 4 C-v") 'scroll-other-window)
@@ -971,6 +973,10 @@ npm i -g javascript-typescript-langserver"
   (when (file-exists-p personal-settings)
     (load-file personal-settings)))
 
+(provide '.emacs)
+;;; .emacs ends here
+
+
 ;; Customize M up/down with terminal
 (define-key input-decode-map "\e[2;9" [M-up])
 (define-key input-decode-map "\e[2;8" [M-down])
@@ -980,6 +986,3 @@ npm i -g javascript-typescript-langserver"
 (global-set-key (kbd "M-<down>") 'move-text-down)
 (global-set-key (kbd "M-<sup>") 'kill-whole-line)
 (global-set-key (kbd "M-<sdown>") 'crux-duplicate-current-line-or-region)
-
-(provide '.emacs)
-;;; .emacs ends here
