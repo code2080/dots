@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: react(js|native)_props
+# key: props
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+const { $0 } = this.props;

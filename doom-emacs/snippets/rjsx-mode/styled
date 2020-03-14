@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: react(js|native)_styled
+# key: styled
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+const ${1:Wrapper} = styled.${2:View}\`
+  $0
+\`;

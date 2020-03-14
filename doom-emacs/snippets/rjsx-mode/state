@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: react(js|native)_state
+# key: state
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+const { $0 } = this.state;

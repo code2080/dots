@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: react(js|native)_create_blank
+# key: rxcb
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+import React, { Component } from 'react';
+
+class ${1:Default} extends Component {
+  render() {
+    return (
+      <$2>
+        $0
+      </$2>
+    );
+  }
+}
+
+export default $1;

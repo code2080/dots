@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: react(js|native)_arrow_func
+# key: func
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+${1:handle} = ($2) => {
+  $0
+}

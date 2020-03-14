@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: react(js|native)_constructor
+# key: rxconstructor
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+constructor(props) {
+  super(props);
+  this.state = {
+    $0
+  };
+}

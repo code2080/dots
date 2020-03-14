@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: react(js|native)_console_log
+# key: console
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+console.log("${1: D: }", $0);

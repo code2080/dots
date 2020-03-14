@@ -91,7 +91,8 @@
   ("C-c D" . crux-delete-file-and-buffer)
   ("C-c r" . crux-rename-buffer-and-file)
   ("C-c t" . crux-visit-term-buffer)
-  ("C-h RET" . crux-find-user-init-file)
+  ;("C-h RET" . crux-find-user-init-file)
+  ("C-h RET" . crux-find-user-custom-file)
   ("C-x x e" . crux-open-with)
   ("C-x 7" . crux-swap-windows))
 
@@ -569,10 +570,8 @@
 (global-set-key (kbd "C-x x s") 'share-to-online)
 (global-set-key (kbd "C-x x t") 'untabify)
 (global-set-key (kbd "C-x x T") 'tabify)
-;(global-set-key (kbd "C-x x M-w") 'copy-to-clipboard)
-(global-set-key (kbd "M-w") 'copy-to-clipboard)
-;(global-set-key (kbd "C-x x C-y") 'paste-from-clipboard)
-(global-set-key (kbd "C-y") 'paste-from-clipboard)
+(global-set-key (kbd "C-x x M-w") 'copy-to-clipboard)
+(global-set-key (kbd "C-x x C-y") 'paste-from-clipboard)
 (global-set-key (kbd "C-x 2") 'split-window-vertically-last-buffer)
 (global-set-key (kbd "C-x 3") 'split-window-horizontally-last-buffer)
 (global-set-key (kbd "C-x 4 C-v") 'scroll-other-window)
@@ -594,24 +593,34 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(Buffer-menu-use-header-line nil)
+ '(ansi-color-names-vector
+   ["#1B2229" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#DFDFDF"])
  '(auto-revert-check-vc-info t)
  '(auto-revert-mode-text " ~")
  '(backup-by-copying t)
  '(browse-url-browser-function (quote eww-browse-url))
  '(column-number-mode t)
  '(compilation-scroll-output t)
+ '(custom-safe-themes
+   (quote
+    ("6b2636879127bf6124ce541b1b2824800afc49c6ccd65439d6eb987dbf200c36" "d362eed16f74bfa8e49df0185a9336184d479e120c41837a5e6f020e0336bf7f" default)))
  '(default-input-method "vietnamese-telex")
  '(delete-old-versions t)
  '(delete-selection-mode t)
  '(eldoc-minor-mode-string " ED")
  '(electric-indent-mode nil)
  '(enable-local-variables :all)
+ '(fci-rule-color "#5B6268")
  '(ffap-machine-p-known (quote reject))
  '(global-hl-line-mode t)
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(initial-scratch-message nil)
+ '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
+ '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
+ '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
  '(kept-new-versions 6)
+ '(line-number-mode nil)
  '(menu-bar-mode nil)
  '(org-agenda-files (quote ("~/.gxt/org")))
  '(org-babel-load-languages (quote ((emacs-lisp . t) (shell . t))))
@@ -623,7 +632,7 @@
      (sequence "WIP(w)" "BLOCKED(b)" "|" "REJECTED(r)"))))
  '(package-selected-packages
    (quote
-    (elpa-mirror tide fuzzy yasnippet-snippets which-key volatile-highlights vlf use-package undo-tree symbol-overlay smex smartparens rainbow-delimiters prettier-js perspective multiple-cursors move-text magit interaction-log indent-guide highlight-leading-spaces git-gutter flymake-eslint flycheck eslint-fix erc-crypt doom-themes crux counsel-projectile company-lsp anzu advice-patch ace-window)))
+    (dracula-theme js2-mode elpa-mirror tide fuzzy yasnippet-snippets which-key volatile-highlights vlf use-package undo-tree symbol-overlay smex smartparens rainbow-delimiters prettier-js perspective multiple-cursors move-text magit interaction-log indent-guide highlight-leading-spaces git-gutter flymake-eslint flycheck eslint-fix erc-crypt doom-themes crux counsel-projectile company-lsp anzu advice-patch ace-window)))
  '(read-quoted-char-radix 16)
  '(safe-local-variable-values
    (quote
@@ -634,6 +643,28 @@
  '(tab-stop-list (quote (4 8 12 16 20 24 28 32 36)))
  '(tab-width 4)
  '(tool-bar-mode nil)
+ '(vc-annotate-background "#282c34")
+ '(vc-annotate-color-map
+   (list
+    (cons 20 "#98be65")
+    (cons 40 "#b4be6c")
+    (cons 60 "#d0be73")
+    (cons 80 "#ECBE7B")
+    (cons 100 "#e6ab6a")
+    (cons 120 "#e09859")
+    (cons 140 "#da8548")
+    (cons 160 "#d38079")
+    (cons 180 "#cc7cab")
+    (cons 200 "#c678dd")
+    (cons 220 "#d974b7")
+    (cons 240 "#ec7091")
+    (cons 260 "#ff6c6b")
+    (cons 280 "#cf6162")
+    (cons 300 "#9f585a")
+    (cons 320 "#6f4e52")
+    (cons 340 "#5B6268")
+    (cons 360 "#5B6268")))
+ '(vc-annotate-very-old-color nil)
  '(version-control t)
  '(whitespace-style
    (quote
@@ -915,11 +946,10 @@ tar -vxf jdt-language-server-latest.tar.gz -C ~/.emacs.d/eclipse.jdt.ls/server/"
 
 ;; web-mode
 (defun develop-web()
-  "WEB development.
-npm i -g javascript-typescript-langserver"
+  "npm i -g eslint_d"
   (interactive)
   (package-install 'web-mode)
-  (package-install 'eslint-fix))
+  (package-install 'eslintd-fix))
 (use-package web-mode
   :ensure t
   :mode
@@ -935,16 +965,10 @@ npm i -g javascript-typescript-langserver"
   (setq web-mode-enable-auto-pairing t)
   (setq web-mode-enable-auto-closing t)
   (setq web-mode-enable-current-element-highlight t)
-(use-package flycheck
-  :ensure t
-  :config
-  (global-flycheck-mode)
-  ;; disable json-jsonlist checking for json files
-  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))
-  ;; disable jshint since we prefer eslint checking
-  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
-  ;; use eslint with web-mode for jsx files
-  (flycheck-add-mode 'javascript-eslint 'web-mode))
+
+(add-hook 'web-mode-hook 'eslintd-fix-mode)
+;(add-hook 'web-mode-hook 'flycheck-mode)
+;(setq flycheck-javascript-eslint-executable "eslint_d")
 
 ;; gitlab-mode
 (defun develop-gitlab-ci()
@@ -968,6 +992,65 @@ npm i -g javascript-typescript-langserver"
   :defer t
   :hook (dockerfile-mode . whitespace-mode))
 
+
+; Customizations
+;; Duplicate & Move up/down
+(defun cstd-duplication-current-line-up()
+  (interactive)
+  (crux-duplicate-current-line-or-region 1)
+  (previous-line 1))
+(define-key input-decode-map "\e[2;9" [M-up])
+(define-key input-decode-map "\e[2;8" [M-down])
+(define-key input-decode-map "\e[2;7" [M-sup])
+(define-key input-decode-map "\e[2;6" [M-sdown])
+(global-set-key (kbd "M-<up>") 'move-text-up)
+(global-set-key (kbd "M-<down>") 'move-text-down)
+(global-set-key (kbd "M-<sup>") 'cstd-duplication-current-line-up)
+(global-set-key (kbd "M-<sdown>") 'crux-duplicate-current-line-or-region)
+
+;; Copy/Paste from clipboard
+(defun copy-to-clipboard ()
+  "Copy to clipboard."
+  (interactive)
+  (if (display-graphic-p)
+      (progn (call-interactively 'clipboard-kill-ring-save))
+    (if (region-active-p)
+        (progn
+          (shell-command-on-region (region-beginning) (region-end) "pbcopy")
+          (deactivate-mark)))))
+(defun paste-from-clipboard ()
+   "Paste from clipboard."
+   (interactive)
+   (if (display-graphic-p)
+       (progn (clipboard-yank))
+     (insert (shell-command-to-string "pbpaste"))))
+(global-set-key (kbd "M-W") 'copy-to-clipboard)
+(global-set-key (kbd "M-Y") 'paste-from-clipboard)
+
+;; Remove line
+(defun cstd-kill-whole-line-keep-pointer()
+  (interactive)
+  (previous-line 1)
+  (next-line 1)
+  (kill-whole-line)
+  (previous-line 1)
+  (next-line 1))
+(global-set-key (kbd "M-D") 'cstd-kill-whole-line-keep-pointer)
+
+;; Replace
+(global-set-key (kbd "M-S") 'isearch-query-replace-regexp)
+
+;; Enable which-key
+(use-package which-key
+  :ensure t
+  :config (which-key-mode))
+
+;; Macro
+(fset 'cstd-username
+   (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("[1;5C[1;5C[1;5C[1;5D [1;5C[1;5D" 0 "%d")) arg)))
+(global-set-key (kbd "<f6>") 'cstd-username)
+
+
 ;; keep personal settings not in the .emacs file
 (let ((personal-settings (expand-file-name "personal.el" user-emacs-directory)))
   (when (file-exists-p personal-settings)
@@ -975,14 +1058,3 @@ npm i -g javascript-typescript-langserver"
 
 (provide '.emacs)
 ;;; .emacs ends here
-
-
-;; Customize M up/down with terminal
-(define-key input-decode-map "\e[2;9" [M-up])
-(define-key input-decode-map "\e[2;8" [M-down])
-(define-key input-decode-map "\e[2;7" [M-sup])
-(define-key input-decode-map "\e[2;6" [M-sdown])
-(global-set-key (kbd "M-<up>") 'move-text-up)
-(global-set-key (kbd "M-<down>") 'move-text-down)
-(global-set-key (kbd "M-<sup>") 'kill-whole-line)
-(global-set-key (kbd "M-<sdown>") 'crux-duplicate-current-line-or-region)

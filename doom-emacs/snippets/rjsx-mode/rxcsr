@@ -1,0 +1,32 @@
+# -*- mode: snippet -*-
+# name: react(js|native)_create_styled_redux
+# key: rxcsr
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import styled from 'styled-components';
+
+const ${2:Container} = styled.${3:View}\`
+
+\`;
+
+class ${1:Default} extends Component {
+  render() {
+    return (
+      <$2>
+        $0
+      </$2>
+    );
+  }
+}
+
+const mapStateToProps = state => ({
+
+});
+
+const mapDispatchToProps = dispatch => ({
+
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)($1);
