@@ -174,7 +174,7 @@
          ((and show-paren-when-point-in-periphery
                (>= (point) eol-pos))
           (show-paren--categorize-paren (1- eol-pos)))))))
-(advice-add 'show-paren--locate-near-paren :override #'show-paren--locate-near-paren-customáds)
+(advice-add 'show-paren--locate-near-paren :override #'show-paren--locate-near-paren-custom)
 
 ;; Fuzzy search
 (load-library "fuzzy")
