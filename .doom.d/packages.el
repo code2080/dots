@@ -53,3 +53,4 @@
 (package! crux)
 (package! move-text)
 (package! fuzzy)
+(package! import-js)

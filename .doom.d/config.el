@@ -101,6 +101,7 @@
       (ace-window 0)))
   (setq js2-mode-display-warnings-and-errors t)
   (add-hook 'js2-mode-hook 'eslintd-fix-mode))
+  ;(add-hook 'after-save-hook 'import-js-fix)
 
 ;; Scroll move to center
 (setq scroll-conservatively 0)
@@ -120,6 +121,7 @@
 (global-set-key (kbd "C-c b p") 'previous-buffer)
 (global-set-key (kbd "C-c C-b") 'crux-switch-to-previous-buffer)
 (global-set-key (kbd "M-@") 'er/expand-region)
+(global-set-key (kbd "C-c d b") 'magit-diff-buffer-file)
 
 ;; Workspace: Auto
 (with-eval-after-load 'counsel
@@ -180,3 +182,6 @@
 (load-library "fuzzy")
 (with-eval-after-load 'fuzzy
   (turn-on-fuzzy-isearch))
+
+;; Disabled projectile caching
+(setq projectile-enable-caching nil)
