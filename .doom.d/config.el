@@ -185,3 +185,6 @@
 
 ;; Disabled projectile caching
 (setq projectile-enable-caching nil)
+
+(with-eval-after-load 'company
+  (setq company-idle-delay 0.1))

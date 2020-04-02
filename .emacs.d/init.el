@@ -6,22 +6,6 @@
 ;(setq gc-cons-threshold #x40000000)
 (setq gc-cons-threshold most-positive-fixnum)
 
-;; (defvar bootstrap-version)
-;; (let ((bootstrap-file
-;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-;;       (bootstrap-version 5))
-;;   (unless (file-exists-p bootstrap-file)
-;;     (with-current-buffer
-;;         (url-retrieve-synchronously
-;;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-;;          'silent 'inhibit-cookies)
-;;       (goto-char (point-max))
-;;       (eval-print-last-sexp)))
-;;   (load bootstrap-file nil 'nomessage))
-
-;; (straight-use-package 'use-package)
-;; (setq straight-use-package-by-default t)
-
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
@@ -67,10 +51,16 @@
   :hook (prog-mode . rainbow-delimiters-mode)
   )
 
+(use-package pyvenv
+  :init
+  (pyvenv-activate "~/.emacs.d/.python-environments/default")
+  )
+
 (use-package company
   :defer t
   :init
-  (setq company-minimum-prefix-length 2
+  (setq company-idle-delay 0.1
+	company-minimum-prefix-length 2
         company-tooltip-limit 14
         company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil
@@ -83,8 +73,26 @@
         company-frontends
         '(company-pseudo-tooltip-frontend
           company-echo-metadata-frontend))
+  ;; (defun my/python-mode-hook ()
+  ;;    (add-to-list 'company-backends 'company-jedi))
+
+  ;; (add-hook 'python-mode-hook 'my/python-mode-hook)
   (global-company-mode +1)
   )
+
+(use-package company-jedi
+  ;:defer t
+  :config
+  (setq jedi:get-in-function-call-delay 100)
+  (setq jedi:complete-on-dot t)
+
+  (defun my/python-mode-hook ()
+    (add-to-list 'company-backends 'company-jedi))
+  
+  (add-hook 'python-mode-hook 'my/python-mode-hook)
+  (add-hook 'python-mode-hook 'jedi-mode)
+  (jedi-mode +1)
+)
 
 (use-package yasnippet
   :defer t
@@ -118,9 +126,39 @@
   )
 
 (use-package ivy-rich
-  ;:requires (counsel)
   :after (counsel)
-  :config (ivy-rich-mode +1)
+  :config
+  (defun +ivy-rich-describe-variable-transformer (cand)
+  "Previews the value of the variable in the minibuffer"
+  (let* ((sym (intern cand))
+         (val (and (boundp sym) (symbol-value sym)))
+         (print-level 3))
+    (replace-regexp-in-string
+     "[\n\t\^[\^M\^@\^G]" " "
+     (cond ((booleanp val)
+            (propertize (format "%s" val) 'face
+                        (if (null val)
+                            'font-lock-comment-face
+                          'success)))
+           ((symbolp val)
+            (propertize (format "'%s" val)
+                        'face 'highlight-quoted-symbol))
+           ((keymapp val)
+            (propertize "<keymap>" 'face 'font-lock-constant-face))
+           ((listp val)
+            (prin1-to-string val))
+           ((stringp val)
+            (propertize (format "%S" val) 'face 'font-lock-string-face))
+           ((numberp val)
+            (propertize (format "%s" val) 'face 'highlight-numbers-number))
+           ((format "%s" val)))
+     t)))
+  (setq ivy-rich-display-transformers-list (plist-put
+					    ivy-rich-display-transformers-list 'counsel-describe-variable
+					    '(:columns ((counsel-describe-variable-transformer (:width 40))
+							(+ivy-rich-describe-variable-transformer (:width 50))
+							(ivy-rich-counsel-variable-docstring (:face font-lock-doc-face))))))
+  (ivy-rich-mode +1)
   )
 
 (use-package ivy-prescient
@@ -132,6 +170,7 @@
 )
 
 (use-package counsel
+  :defer t
   :config
   (defcustom counsel-recentf-include-xdg-list nil
     "Include recently used files listed by XDG-compliant environments, e.g. GNOME and KDE.
@@ -139,13 +178,10 @@ https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec/."
     :type 'boolean
     )
   
-  ; Sort counsel-recentf by time
-  (add-to-list 'ivy-sort-functions-alist
-	       '(counsel-recentf . file-newer-than-file-p))
-  
   ;; Don't use ^ as initial input. Set this here because `counsel' defines more
   ;; of its own, on top of the defaults.
   (setq ivy-initial-inputs-alist nil)
+  ;(define-key counsel-mode-map [remap describe-variable] #'counsel-describe-variable)
   :bind
   (("M-x" . counsel-M-x)
   ("C-x C-f" . counsel-find-file)
@@ -155,6 +191,8 @@ https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec/."
   ("C-c b m" . counsel-bookmark)
   ("C-c f r" . counsel-recentf)
   ("C-c a g" . counsel-ag)
+  ("C-h v" . counsel-describe-variable)
+  ("C-h f" . counsel-describe-function)
   ("C-c r g" . counsel-rg))
   )
 
@@ -208,7 +246,7 @@ https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec/."
   :bind
   (("M-<sup>" . crux-duplication-current-line-or-region-up)
   ("M-<sdown>" . crux-duplicate-current-line-or-region)
-  ("C-c C-b" . crux-switch-previous-buffer)
+  ("C-c C-b" . crux-switch-to-previous-buffer)
   ("C-c f s" . crux-create-scratch-buffer)
   ("C-c k o" . crux-kill-other-buffers)
   ("C-a" . crux-move-beginning-of-line))
@@ -345,7 +383,21 @@ DOWNLOADS: The max-downloads"
 
 
 
-;; Local Variables:
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (pyvenv jedi exec-path-from-shell virtualenv company-jedi ycmd yasnippet xclip which-key use-package undo-tree rainbow-delimiters multiple-cursors move-text magit ivy-rich ivy-prescient gcmh fuzzy flycheck doom-themes doom-modeline crux counsel-projectile company))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+	;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
 ;; End:
 
