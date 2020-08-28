@@ -247,7 +247,7 @@ https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec/."
   (("M-<sup>" . crux-duplication-current-line-or-region-up)
   ("M-<sdown>" . crux-duplicate-current-line-or-region)
   ("C-c C-b" . crux-switch-to-previous-buffer)
-  ("C-c f s" . crux-create-scratch-buffer)
+  ("C-c f x" . crux-create-scratch-buffer)
   ("C-c k o" . crux-kill-other-buffers)
   ("C-a" . crux-move-beginning-of-line))
   )
@@ -345,6 +345,8 @@ DOWNLOADS: The max-downloads"
 (global-set-key (kbd "M-S") 'isearch-query-replace)
 (global-set-key (kbd "C-x K") 'kill-this-buffer)
 (global-set-key (kbd "C-c r b") (lambda () (interactive) (revert-buffer nil t) (message "Buffer is reverted")))
+(require 'org)
+(define-key org-mode-map (kbd "C-c C-b") 'crux-switch-to-previous-buffer)
 
 (xterm-mouse-mode)
 (show-paren-mode)
