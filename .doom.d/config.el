@@ -188,3 +188,5 @@
 
 ;(with-eval-after-load 'company
 ;  (setq company-idle-delay 0.1))
+
+(add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
