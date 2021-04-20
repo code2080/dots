@@ -94,14 +94,21 @@
 
 ;; Auto fix when save & Kbd for show debug
 (with-eval-after-load 'js2-mode
+  (run-import-js)
   (define-key js2-mode-map (kbd "C-c C-d")
     (lambda ()
       (interactive)
       (flycheck-list-errors)
       (ace-window 0)))
   (setq js2-mode-display-warnings-and-errors t)
-  (add-hook 'js2-mode-hook 'eslintd-fix-mode))
-  ;(add-hook 'after-save-hook 'import-js-fix)
+  (add-hook 'js2-mode-hook 'eslintd-fix-mode)
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (add-hook 'after-save-hook 'import-js-fix nil 'local)
+              )))
+
+(add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
+(setq flycheck-javascript-eslint-executable "eslint_d")
 
 ;; Scroll move to center
 (setq scroll-conservatively 0)
@@ -187,6 +194,4 @@
 (setq projectile-enable-caching nil)
 
 ;(with-eval-after-load 'company
-;  (setq company-idle-delay 0.1))
-
-(add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
+;  (setq company-idle-delay 0.1)),
