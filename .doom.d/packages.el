@@ -50,7 +50,8 @@
 ;; our package manager can't deal with; see raxod502/straight.el#279)
 ;(package! builtin-package :recipe (:branch "develop"))
 
-(package! crux)
+(package! crux)   
 (package! move-text)
-(package! fuzzy)
+;(package! fuzzy)
+(package! eslintd-fix)
 (package! import-js)

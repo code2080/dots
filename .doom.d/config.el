@@ -84,15 +84,16 @@
 (global-set-key (kbd "M-<sup>") 'cstd-duplication-current-line-up)
 (global-set-key (kbd "M-<sdown>") 'crux-duplicate-current-line-or-region)
 
-;; Macro
-(fset 'cstd-username
-      (lambda
-        (&optional arg)
-        (interactive "p")
-        (kmacro-exec-ring-item (quote ("^[[1;5C^[[1;5C^[[1;5C^[[1;5D^@^A^?^[[1;5C^K^[[1;5D^N" 0 "%d")) arg)))
-(global-set-key (kbd "<f6>") 'cstd-username)
-
 ;; Auto fix when save & Kbd for show debug
+(with-eval-after-load 'import-js
+  (defun import-js-fix ()
+    "Run import-js on an entire file, importing or fixing as necessary"
+    (interactive)
+    (import-js-check-daemon)
+    (setq import-js-output "")
+    (setq import-js-handler 'import-js-handle-imports)
+    (import-js-send-input `(("command" . "fix")))))
+
 (with-eval-after-load 'js2-mode
   (run-import-js)
   (define-key js2-mode-map (kbd "C-c C-d")
@@ -101,14 +102,14 @@
       (flycheck-list-errors)
       (ace-window 0)))
   (setq js2-mode-display-warnings-and-errors t)
-  (add-hook 'js2-mode-hook 'eslintd-fix-mode)
   (add-hook 'js2-mode-hook
             (lambda ()
-              (add-hook 'after-save-hook 'import-js-fix nil 'local)
+              (eslintd-fix-mode)
+              (add-hook 'after-save-hook 'import-js-fix nil 'make-it-local)
               )))
 
 (add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
-(setq flycheck-javascript-eslint-executable "eslint_d")
+;(setq flycheck-javascript-eslint-executable "eslint_d")
 
 ;; Scroll move to center
 (setq scroll-conservatively 0)
@@ -185,13 +186,21 @@
           (show-paren--categorize-paren (1- eol-pos)))))))
 (advice-add 'show-paren--locate-near-paren :override #'show-paren--locate-near-paren-custom)
 
-;; Fuzzy search
-(load-library "fuzzy")
-(with-eval-after-load 'fuzzy
-  (turn-on-fuzzy-isearch))
-
 ;; Disabled projectile caching
 (setq projectile-enable-caching nil)
 
 ;(with-eval-after-load 'company
 ;  (setq company-idle-delay 0.1)),
+
+(with-eval-after-load 'lsp-mode
+  (add-hook 'before-save-hook
+            (lambda ()
+              (if (eq major-mode 'python-mode)
+                  (lsp-format-buffer))
+              )))
+(flycheck-def-config-file-var flycheck-flake8-config python-flake8  '(".flake8rc" "tox.ini" "setup.cfg"))
+
+(setq lsp-pylsp-plugins-flake8-max-line-length 88)
+(setq lsp-pylsp-plugins-pydocstyle-ignore "D100")
+
+(xterm-mouse-mode)
