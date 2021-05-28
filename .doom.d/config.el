@@ -54,11 +54,12 @@
 
 
 ;; ;; Fix to use mouse scroll
+(xterm-mouse-mode)
 (global-set-key [mouse-4] 'scroll-down-line)
 (global-set-key [mouse-5] 'scroll-up-line)
 
 ;; Hide line numbers
-;(setq display-line-numbers-type nil)
+;;(setq display-line-numbers-type nil)
 
 ;; Remove line
 (defun cstd-kill-whole-line-keep-pointer()
@@ -79,10 +80,17 @@
 (define-key input-decode-map "\e[2;8" [M-down])
 (define-key input-decode-map "\e[2;7" [M-sup])
 (define-key input-decode-map "\e[2;6" [M-sdown])
+
 (global-set-key (kbd "M-<up>") 'move-text-up)
 (global-set-key (kbd "M-<down>") 'move-text-down)
 (global-set-key (kbd "M-<sup>") 'cstd-duplication-current-line-up)
 (global-set-key (kbd "M-<sdown>") 'crux-duplicate-current-line-or-region)
+(global-set-key (kbd "<S-mouse-1>") 'mouse-set-mark)
+;;(setq scroll-preserve-screen-position nil)
+;;(global-unset-key (kbd "<down-mouse-1>"))
+;;(global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click)
+;;(global-set-key (kbd "<mouse-1>") 'mc/add-cursor-on-click)
+
 
 ;; Auto fix when save & Kbd for show debug
 (with-eval-after-load 'import-js
@@ -109,7 +117,7 @@
               )))
 
 (add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
-;(setq flycheck-javascript-eslint-executable "eslint_d")
+;;(setq flycheck-javascript-eslint-executable "eslint_d")
 
 ;; Scroll move to center
 (setq scroll-conservatively 0)
@@ -143,7 +151,7 @@
             (let (project-name (project-name-root (projectile-project-root (expand-file-name x))))
               (if project-name-root
                   (setq project-name (funcall projectile-project-name-function project-name-root))
-                  (setq project-name "main"))
+                (setq project-name "main"))
               (persp-switch project-name)))
         (find-file (expand-file-name x ivy--directory))))))
 
@@ -189,18 +197,29 @@
 ;; Disabled projectile caching
 (setq projectile-enable-caching nil)
 
-;(with-eval-after-load 'company
-;  (setq company-idle-delay 0.1)),
+;;(with-eval-after-load 'company
+;;(setq company-idle-delay 0.1))
 
 (with-eval-after-load 'lsp-mode
+  (setq lsp-pylsp-plugins-flake8-max-line-length 88)
+  (setq lsp-pylsp-plugins-pydocstyle-ignore "D100")
+  (setq lsp-pylsp-plugins-pylint-enabled t)
+  (setq lsp-pylsp-plugins-pylint-args ["--disable" "C0114,C0116"])
+  (setq lsp-pylsp-plugins-black-enabled t)
+  (setq lsp-pylsp-plugins-jedi-use-pyenv-environment t)
+  (flycheck-def-config-file-var flycheck-flake8-config python-flake8  '(".flake8rc" "tox.ini" "setup.cfg"))
   (add-hook 'before-save-hook
             (lambda ()
-              (if (eq major-mode 'python-mode)
+              (if (eq lsp-mode t)
                   (lsp-format-buffer))
               )))
-(flycheck-def-config-file-var flycheck-flake8-config python-flake8  '(".flake8rc" "tox.ini" "setup.cfg"))
 
-(setq lsp-pylsp-plugins-flake8-max-line-length 88)
-(setq lsp-pylsp-plugins-pydocstyle-ignore "D100")
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("templates.*\\.html" . web-mode))
 
-(xterm-mouse-mode)
+(add-hook 'web-mode-hook
+          '(lambda ()
+             (setq web-mode-markup-indent-offset 2)
+             (setq web-mode-css-indent-offset 2)
+             (setq web-mode-code-indent-offset 2)
+             ))

@@ -52,6 +52,8 @@
 
 (package! crux)   
 (package! move-text)
-;(package! fuzzy)
+;;(package! fuzzy)
 (package! eslintd-fix)
 (package! import-js)
+;;(package! multiple-cursors)
+(package! web-mode)
