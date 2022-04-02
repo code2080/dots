@@ -113,10 +113,13 @@
   (add-hook 'js2-mode-hook
             (lambda ()
               (eslintd-fix-mode)
-              (add-hook 'after-save-hook 'import-js-fix nil 'make-it-local)
+              ;(add-hook 'after-save-hook 'import-js-fix nil 'make-it-local)
               )))
 
 (add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
+(add-to-list 'auto-mode-alist '("\\/.*\\.jsx\\'" . rjsx-mode))
+(add-to-list 'auto-mode-alist '("\\/.*\\.ts\\'" . rjsx-mode))
+(add-to-list 'auto-mode-alist '("\\/.*\\.tsx\\'" . rjsx-mode))
 ;;(setq flycheck-javascript-eslint-executable "eslint_d")
 
 ;; Scroll move to center
@@ -203,7 +206,7 @@
 (with-eval-after-load 'lsp-mode
   (setq lsp-pylsp-plugins-flake8-max-line-length 88)
   (setq lsp-pylsp-plugins-pydocstyle-ignore "D100")
-  (setq lsp-pylsp-plugins-pylint-enabled t)
+  (setq lsp-pylsp-plugins-pylint-enabled 0)
   (setq lsp-pylsp-plugins-pylint-args ["--disable" "C0114,C0116"])
   (setq lsp-pylsp-plugins-black-enabled t)
   (setq lsp-pylsp-plugins-jedi-use-pyenv-environment t)
@@ -223,3 +226,8 @@
              (setq web-mode-css-indent-offset 2)
              (setq web-mode-code-indent-offset 2)
              ))
+
+(custom-set-faces
+ ;; other faces
+ '(magit-diff-added ((((type tty)) (:foreground "lightgreen" :background "darkgreen"))))
+ '(magit-diff-added-highlight ((((type tty)) (:foreground "lightgreen")))))
