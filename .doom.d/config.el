@@ -57,6 +57,8 @@
 (xterm-mouse-mode)
 (global-set-key [mouse-4] 'scroll-down-line)
 (global-set-key [mouse-5] 'scroll-up-line)
+(global-set-key (kbd "<wheel-up>") 'scroll-down-line)
+(global-set-key (kbd "<wheel-down>") 'scroll-up-line)
 
 ;; Hide line numbers
 ;;(setq display-line-numbers-type nil)
@@ -69,20 +71,21 @@
   (kill-whole-line)
   (previous-line 1)
   (next-line 1))
-(global-set-key (kbd "M-D") 'cstd-kill-whole-line-keep-pointer)
+(define-key input-decode-map "\e[0;5A" [M-D])
+(global-set-key (kbd "<M-D>") 'cstd-kill-whole-line-keep-pointer)
 
 ;; Duplicate & Move up/down
 (defun cstd-duplication-current-line-up()
   (interactive)
   (crux-duplicate-current-line-or-region 1)
   (previous-line 1))
-(define-key input-decode-map "\e[2;9" [M-up])
-(define-key input-decode-map "\e[2;8" [M-down])
-(define-key input-decode-map "\e[2;7" [M-sup])
-(define-key input-decode-map "\e[2;6" [M-sdown])
+;;(define-key input-decode-map "\e[2;9" [M-up])
+;;(define-key input-decode-map "\e[2;6D" [M-down])
+(define-key input-decode-map "\e[0;4B" [M-sup])
+(define-key input-decode-map "\e[0;4A" [M-sdown])
 
-(global-set-key (kbd "M-<up>") 'move-text-up)
-(global-set-key (kbd "M-<down>") 'move-text-down)
+;;(global-set-key (kbd "C-<left>") 'move-text-down)
+;;(global-set-key (kbd "C-<right>") 'move-text-up)
 (global-set-key (kbd "M-<sup>") 'cstd-duplication-current-line-up)
 (global-set-key (kbd "M-<sdown>") 'crux-duplicate-current-line-or-region)
 (global-set-key (kbd "<S-mouse-1>") 'mouse-set-mark)
@@ -126,11 +129,11 @@
 (setq scroll-conservatively 0)
 
 ;; Kbd
-(define-key input-decode-map "\e[1;5C" [M-right1])
-(define-key input-decode-map "\e[1;5D" [M-left1])
-(global-set-key (kbd "M-<right1>") (lambda () (interactive) (right-word 1)))
-(global-set-key (kbd "M-<left1>") (lambda () (interactive) (left-word 1)))
-(global-set-key (kbd "C-x C-@") 'pop-to-mark-command)
+;;(define-key input-decode-map "\e[1;5C" [M-right1])
+;;(define-key input-decode-map "\e[1;5D" [M-left1])
+;;(global-set-key (kbd "M-<right1>") (lambda () (interactive) (right-word 1)))
+;;(global-set-key (kbd "M-<left1>") (lambda () (interactive) (left-word 1)))
+(global-set-key (kbd "C-x C-SPC") 'pop-to-mark-command)
 (global-set-key (kbd "M-S") 'isearch-query-replace)
 (global-set-key (kbd "C-c a g") 'counsel-ag)
 (global-set-key (kbd "C-c r g") 'counsel-rg)
@@ -231,3 +234,36 @@
  ;; other faces
  '(magit-diff-added ((((type tty)) (:foreground "lightgreen" :background "darkgreen"))))
  '(magit-diff-added-highlight ((((type tty)) (:foreground "lightgreen")))))
+
+(eval-after-load "isearch" '(require 'isearch-prop))
+
+(defun hide/show-parenthetical-text (&optional show)
+  "Remove parentheses and text between them.
+    With a prefix arg, show all invisible text."
+  (interactive)
+  (if show
+      (isearchp-make-zones-visible `((,(point-min) ,(point-max))))
+    (let ((isearchp-dim-outside-search-area-flag  nil))
+      (isearchp-regexp-define-contexts (point-min) (point-max) 'invisible "([^)]*)"))))
+
+(defun translate-hide ()
+  (interactive)
+  (defface hi-hide
+    '((((background dark)) (:background "black" :foreground "black")))
+    "Face for hi-lock mode."
+    :group 'hi-lock-faces)
+  (highlight-regexp "(.*)" 'hi-hide))
+
+(global-set-key (kbd "C-c c <right>") 'org-tree-slide-move-next-tree)
+(global-set-key (kbd "C-c c <left>") 'org-tree-slide-move-previous-tree)
+
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
+(setq! company-idle-delay 0.1)

@@ -57,3 +57,8 @@
 (package! import-js)
 ;;(package! multiple-cursors)
 (package! web-mode)
+(package! isearch-prop)
+(package! editorconfig)
+(package! jsonrpc)
+(package! copilot
+  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
