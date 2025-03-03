@@ -50,15 +50,15 @@
 ;; our package manager can't deal with; see raxod502/straight.el#279)
 ;(package! builtin-package :recipe (:branch "develop"))
 
-(package! crux)   
-(package! move-text)
-;;(package! fuzzy)
+(package! crux)
+(package! jtsx)
 (package! eslintd-fix)
 (package! import-js)
-;;(package! multiple-cursors)
-(package! web-mode)
 (package! isearch-prop)
-(package! editorconfig)
-(package! jsonrpc)
 (package! copilot
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
+(package! polymode)
+(package! vundo)
+(package! command-log-mode)
+(package! copilot-chat
+  :recipe (:host github :repo "chep/copilot-chat.el" :files ("*.el")))

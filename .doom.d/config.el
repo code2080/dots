@@ -34,7 +34,6 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 
-
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
@@ -53,97 +52,48 @@
 ;; they are implemented.
 
 
+;; Disabled projectile caching
+(setq projectile-enable-caching nil)
+
+(setq confirm-kill-emacs nil)
+
+(remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
+
 ;; ;; Fix to use mouse scroll
-(xterm-mouse-mode)
+;; (xterm-mouse-mode)
 (global-set-key [mouse-4] 'scroll-down-line)
 (global-set-key [mouse-5] 'scroll-up-line)
 (global-set-key (kbd "<wheel-up>") 'scroll-down-line)
 (global-set-key (kbd "<wheel-down>") 'scroll-up-line)
 
-;; Hide line numbers
-;;(setq display-line-numbers-type nil)
-
 ;; Remove line
-(defun cstd-kill-whole-line-keep-pointer()
+(defun kill-whole-line-keep-pointer()
   (interactive)
   (previous-line 1)
   (next-line 1)
   (kill-whole-line)
   (previous-line 1)
   (next-line 1))
-(define-key input-decode-map "\e[0;5A" [M-D])
-(global-set-key (kbd "<M-D>") 'cstd-kill-whole-line-keep-pointer)
 
 ;; Duplicate & Move up/down
-(defun cstd-duplication-current-line-up()
+(defun duplication-current-line-up()
   (interactive)
   (crux-duplicate-current-line-or-region 1)
   (previous-line 1))
-;;(define-key input-decode-map "\e[2;9" [M-up])
-;;(define-key input-decode-map "\e[2;6D" [M-down])
+
+(define-key input-decode-map "\e[0;5A" [M-D])
+(global-set-key (kbd "<M-D>") 'kill-whole-line-keep-pointer)
+
 (define-key input-decode-map "\e[0;4B" [M-sup])
 (define-key input-decode-map "\e[0;4A" [M-sdown])
 
-;;(global-set-key (kbd "C-<left>") 'move-text-down)
-;;(global-set-key (kbd "C-<right>") 'move-text-up)
 (global-set-key (kbd "M-<sup>") 'cstd-duplication-current-line-up)
 (global-set-key (kbd "M-<sdown>") 'crux-duplicate-current-line-or-region)
 (global-set-key (kbd "<S-mouse-1>") 'mouse-set-mark)
-;;(setq scroll-preserve-screen-position nil)
-;;(global-unset-key (kbd "<down-mouse-1>"))
-;;(global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click)
-;;(global-set-key (kbd "<mouse-1>") 'mc/add-cursor-on-click)
-
-
-;; Auto fix when save & Kbd for show debug
-(with-eval-after-load 'import-js
-  (defun import-js-fix ()
-    "Run import-js on an entire file, importing or fixing as necessary"
-    (interactive)
-    (import-js-check-daemon)
-    (setq import-js-output "")
-    (setq import-js-handler 'import-js-handle-imports)
-    (import-js-send-input `(("command" . "fix")))))
-
-(with-eval-after-load 'js2-mode
-  (run-import-js)
-  (define-key js2-mode-map (kbd "C-c C-d")
-    (lambda ()
-      (interactive)
-      (flycheck-list-errors)
-      (ace-window 0)))
-  (setq js2-mode-display-warnings-and-errors t)
-  (add-hook 'js2-mode-hook
-            (lambda ()
-              (eslintd-fix-mode)
-              ;(add-hook 'after-save-hook 'import-js-fix nil 'make-it-local)
-              )))
-
-(add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
-(add-to-list 'auto-mode-alist '("\\/.*\\.jsx\\'" . rjsx-mode))
-(add-to-list 'auto-mode-alist '("\\/.*\\.ts\\'" . rjsx-mode))
-(add-to-list 'auto-mode-alist '("\\/.*\\.tsx\\'" . rjsx-mode))
-;;(setq flycheck-javascript-eslint-executable "eslint_d")
-
-;; Scroll move to center
-(setq scroll-conservatively 0)
-
-;; Kbd
-;;(define-key input-decode-map "\e[1;5C" [M-right1])
-;;(define-key input-decode-map "\e[1;5D" [M-left1])
-;;(global-set-key (kbd "M-<right1>") (lambda () (interactive) (right-word 1)))
-;;(global-set-key (kbd "M-<left1>") (lambda () (interactive) (left-word 1)))
 (global-set-key (kbd "C-x C-SPC") 'pop-to-mark-command)
-(global-set-key (kbd "M-S") 'isearch-query-replace)
-(global-set-key (kbd "C-c a g") 'counsel-ag)
 (global-set-key (kbd "C-c r g") 'counsel-rg)
-(global-set-key (kbd "C-c k o") 'doom/kill-other-buffers)
-(global-set-key (kbd "C-c r b") (lambda () (interactive) (revert-buffer nil t) (message "Buffer is reverted")))
-(global-set-key (kbd "C-c b n") 'next-buffer)
-(global-set-key (kbd "C-c b p") 'previous-buffer)
 (global-set-key (kbd "C-c C-b") 'crux-switch-to-previous-buffer)
 (global-set-key (kbd "M-@") 'er/expand-region)
-(global-set-key (kbd "C-c d b") 'magit-diff-buffer-file)
 
 ;; Workspace: Auto
 (with-eval-after-load 'counsel
@@ -173,89 +123,7 @@
     (deactivate-mark)))
 (advice-add 'isearch-forward :override #'isearch-forward-with-selection)
 
-;; Turn off Paren highlight when Selecting
-(defun show-paren--locate-near-paren-custom ()
-  (if (not (use-region-p))
-      (let* ((ind-pos (save-excursion (back-to-indentation) (point)))
-             (eol-pos
-              (save-excursion
-                (end-of-line) (skip-chars-backward " \t" ind-pos) (point)))
-             (before (show-paren--categorize-paren (1- (point))))
-             (after (show-paren--categorize-paren (point))))
-        (cond
-         ;; Point is immediately outside a paren.
-         ((eq (car before) -1) before)
-         ((eq (car after) 1) after)
-         ;; Point is immediately inside a paren.
-         ((and show-paren-when-point-inside-paren before))
-         ((and show-paren-when-point-inside-paren after))
-         ;; Point is in the whitespace before the code.
-         ((and show-paren-when-point-in-periphery
-               (<= (point) ind-pos))
-          (or (show-paren--categorize-paren ind-pos)
-              (show-paren--categorize-paren (1- eol-pos))))
-         ;; Point is in the whitespace after the code.
-         ((and show-paren-when-point-in-periphery
-               (>= (point) eol-pos))
-          (show-paren--categorize-paren (1- eol-pos)))))))
-(advice-add 'show-paren--locate-near-paren :override #'show-paren--locate-near-paren-custom)
-
-;; Disabled projectile caching
-(setq projectile-enable-caching nil)
-
-;;(with-eval-after-load 'company
-;;(setq company-idle-delay 0.1))
-
-(with-eval-after-load 'lsp-mode
-  (setq lsp-pylsp-plugins-flake8-max-line-length 88)
-  (setq lsp-pylsp-plugins-pydocstyle-ignore "D100")
-  (setq lsp-pylsp-plugins-pylint-enabled 0)
-  (setq lsp-pylsp-plugins-pylint-args ["--disable" "C0114,C0116"])
-  (setq lsp-pylsp-plugins-black-enabled t)
-  (setq lsp-pylsp-plugins-jedi-use-pyenv-environment t)
-  (flycheck-def-config-file-var flycheck-flake8-config python-flake8  '(".flake8rc" "tox.ini" "setup.cfg"))
-  (add-hook 'before-save-hook
-            (lambda ()
-              (if (eq lsp-mode t)
-                  (lsp-format-buffer))
-              )))
-
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("templates.*\\.html" . web-mode))
-
-(add-hook 'web-mode-hook
-          '(lambda ()
-             (setq web-mode-markup-indent-offset 2)
-             (setq web-mode-css-indent-offset 2)
-             (setq web-mode-code-indent-offset 2)
-             ))
-
-(custom-set-faces
- ;; other faces
- '(magit-diff-added ((((type tty)) (:foreground "lightgreen" :background "darkgreen"))))
- '(magit-diff-added-highlight ((((type tty)) (:foreground "lightgreen")))))
-
 (eval-after-load "isearch" '(require 'isearch-prop))
-
-(defun hide/show-parenthetical-text (&optional show)
-  "Remove parentheses and text between them.
-    With a prefix arg, show all invisible text."
-  (interactive)
-  (if show
-      (isearchp-make-zones-visible `((,(point-min) ,(point-max))))
-    (let ((isearchp-dim-outside-search-area-flag  nil))
-      (isearchp-regexp-define-contexts (point-min) (point-max) 'invisible "([^)]*)"))))
-
-(defun translate-hide ()
-  (interactive)
-  (defface hi-hide
-    '((((background dark)) (:background "black" :foreground "black")))
-    "Face for hi-lock mode."
-    :group 'hi-lock-faces)
-  (highlight-regexp "(.*)" 'hi-hide))
-
-(global-set-key (kbd "C-c c <right>") 'org-tree-slide-move-next-tree)
-(global-set-key (kbd "C-c c <left>") 'org-tree-slide-move-previous-tree)
 
 ;; accept completion from copilot and fallback to company
 (use-package! copilot
@@ -267,3 +135,137 @@
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
 (setq! company-idle-delay 0.1)
+
+(use-package! jtsx
+  :mode (("\\.jsx?\\'" . jtsx-jsx-mode)
+         ("\\.ts\\'" . jtsx-typescript-mode))
+  :commands jtsx-install-treesit-language
+  :hook ((jtsx-jsx-mode . hs-minor-mode)
+         (jtsx-tsx-mode . hs-minor-mode)
+         (jtsx-typescript-mode . hs-minor-mode))
+  :custom
+  ;; Optional customizations
+  (js-indent-level 2)
+  (typescript-ts-mode-indent-offset 2)
+  (jtsx-switch-indent-offset 4)
+  ;; (jtsx-indent-statement-block-regarding-standalone-parent nil)
+  ;; (jtsx-jsx-element-move-allow-step-out t)
+  ;; (jtsx-enable-jsx-electric-closing-element t)
+  ;; (jtsx-enable-electric-open-newline-between-jsx-element-tags t)
+  ;; (jtsx-enable-jsx-element-tags-auto-sync nil)
+  ;; (jtsx-enable-all-syntax-highlighting-features t)
+  :config
+  (defun jtsx-bind-keys-to-mode-map (mode-map)
+    "Bind keys to MODE-MAP."
+    (define-key mode-map (kbd "C-c C-j") 'jtsx-jump-jsx-element-tag-dwim)
+    (define-key mode-map (kbd "C-c j o") 'jtsx-jump-jsx-opening-tag)
+    (define-key mode-map (kbd "C-c j c") 'jtsx-jump-jsx-closing-tag)
+    (define-key mode-map (kbd "C-c j r") 'jtsx-rename-jsx-element)
+    (define-key mode-map (kbd "C-c <down>") 'jtsx-move-jsx-element-tag-forward)
+    (define-key mode-map (kbd "C-c <up>") 'jtsx-move-jsx-element-tag-backward)
+    (define-key mode-map (kbd "C-c C-<down>") 'jtsx-move-jsx-element-forward)
+    (define-key mode-map (kbd "C-c C-<up>") 'jtsx-move-jsx-element-backward)
+    (define-key mode-map (kbd "C-c C-S-<down>") 'jtsx-move-jsx-element-step-in-forward)
+    (define-key mode-map (kbd "C-c C-S-<up>") 'jtsx-move-jsx-element-step-in-backward)
+    (define-key mode-map (kbd "C-c j w") 'jtsx-wrap-in-jsx-element)
+    (define-key mode-map (kbd "C-c j u") 'jtsx-unwrap-jsx)
+    (define-key mode-map (kbd "C-c j d n") 'jtsx-delete-jsx-node)
+    (define-key mode-map (kbd "C-c j d a") 'jtsx-delete-jsx-attribute)
+    (define-key mode-map (kbd "C-c j t") 'jtsx-toggle-jsx-attributes-orientation)
+    (define-key mode-map (kbd "C-c j h") 'jtsx-rearrange-jsx-attributes-horizontally)
+    (define-key mode-map (kbd "C-c j v") 'jtsx-rearrange-jsx-attributes-vertically))
+
+  (defun jtsx-bind-keys-to-jtsx-jsx-mode-map ()
+    (jtsx-bind-keys-to-mode-map jtsx-jsx-mode-map))
+
+  (defun jtsx-bind-keys-to-jtsx-tsx-mode-map ()
+    (jtsx-bind-keys-to-mode-map jtsx-tsx-mode-map))
+
+  (add-hook 'jtsx-jsx-mode-hook 'jtsx-bind-keys-to-jtsx-jsx-mode-map)
+  (add-hook 'jtsx-tsx-mode-hook 'jtsx-bind-keys-to-jtsx-tsx-mode-map))
+
+(use-package! tide
+  :after (typescript-mode company flycheck)
+  :config
+  ;; Cấu hình hiển thị documentation
+  (setq tide-completion-detailed t)
+  (setq tide-always-show-documentation t)
+
+  ;; Cấu hình eldoc - hiển thị thông tin ở minibuffer
+  (setq tide-hl-identifier-idle-time 0.5)
+
+  ;; Hiển thị thông tin ở bottom thay vì sidebar
+  (setq tide-show-xref-function 'xref-show-definitions-buffer)
+
+  ;; Thiết lập cho hiển thị documentation khi hover
+  (setq tide-eldoc-function 'tide-eldoc-function)
+
+  ;; Cấu hình format cho documentation
+  (setq tide-doc-buffer-name "*tide-documentation*")
+  (setq tide-doc-max-height 20)
+  (setq tide-doc-buffer-max-lines 20))
+
+;; Tăng giới hạn hiển thị cho eldoc
+(setq eldoc-echo-area-use-multiline-p t)
+(setq eldoc-echo-area-display-truncation-message nil)
+(setq eldoc-echo-area-prefer-doc-buffer t)
+(setq eldoc-idle-delay 0.1)
+
+(use-package! polymode
+  :init
+  (define-polymode tsx-scss-mode
+    :hostmode 'tsx-hostmode
+    :innermodes '(scss-innermode))
+
+  (define-hostmode tsx-hostmode
+    :mode 'jtsx-tsx-mode)
+
+  (define-innermode scss-innermode
+    :mode 'scss-mode
+    :head-matcher "styled\\(\\.?[a-zA-Z0-9()]+\\)*"
+    :tail-matcher ";"))
+
+;;(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-scss-mode))
+
+;; Hàm thiết lập cho Tide mode
+(defun setup-tide-mode ()
+  "Set up Tide mode with necessary configurations."
+  (interactive)
+  (tide-setup)
+  (tide-hl-identifier-mode +1)
+  (eldoc-mode +1)
+  (flycheck-mode +1)
+  (eslintd-fix-mode +1))
+
+;; Thêm setup-tide-mode vào các hook phù hợp
+(dolist (hook '(jtsx-typescript-mode-hook
+                jtsx-jsx-mode-hook
+                jtsx-tsx-mode-hook
+                scss-mode-hook
+                tsx-scss-mode-hook))
+  (add-hook hook 'setup-tide-mode))
+
+;; Đảm bảo rằng tide-mode luôn được kích hoạt khi mở file
+(defun ensure-tide-mode-on-jump ()
+  "Ensure Tide mode and tsx-scss-mode are active after jumping to a new file."
+  (when (and buffer-file-name
+             (string-match-p "\\.tsx\\'" buffer-file-name))
+    (tsx-scss-mode)
+    (setup-tide-mode)))
+
+;; Thêm hook vào find-file-hook
+(add-hook 'find-file-hook 'ensure-tide-mode-on-jump)
+
+;;; SEARCHING: ripgrep, anzu, engine-mode
+(use-package! isearch
+  :init
+  (global-set-key (kbd "M-s s") 'isearch-forward-regexp)
+  (global-set-key (kbd "M-s %") 'query-replace-regexp)
+  (define-key isearch-mode-map (kbd "M-s %") 'isearch-query-replace-regexp))
+
+(use-package! vundo
+  :init (global-set-key (kbd "C-x u") #'vundo)
+  :config
+  (setq vundo-glyph-alist vundo-unicode-symbols) ; Sử dụng ký tự đẹp hơn
+  (setq vundo-window-max-height 30)             ; Tăng chiều cao cửa sổ nếu cần
+  (setq vundo-compact-display nil))             ; Tắt chế độ hiển thị nhỏ gọn
